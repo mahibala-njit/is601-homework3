@@ -42,3 +42,36 @@ def test_divide_by_zero():
     calc = Calculation(Decimal('10'), Decimal('0'), divide)
     with pytest.raises(ZeroDivisionError, match="Cannot divide by zero"):
         calc.perform()
+
+@pytest.mark.parametrize("a, b, operation, expected", [
+    (Decimal('-5'), Decimal('5'), add, Decimal('0')),  # Test negative + positive
+    (Decimal('-10'), Decimal('-5'), subtract, Decimal('-5')),  # Test subtraction with negatives
+    (Decimal('3'), Decimal('-2'), multiply, Decimal('-6')),  # Test multiplication with one negative
+    (Decimal('-10'), Decimal('-2'), divide, Decimal('5')),  # Test division with negatives
+])
+def test_calculation_with_negative_numbers(a, b, operation, expected):
+    """
+    Test calculation with negative numbers to ensure correct behavior.
+    """
+    calc = Calculation(a, b, operation)
+    assert calc.perform() == expected
+
+@pytest.mark.parametrize("a, b, operation, expected", [
+    (Decimal('0'), Decimal('5'), add, Decimal('5')),  # Test zero + positive
+    (Decimal('5'), Decimal('0'), subtract, Decimal('5')),  # Test positive - zero
+    (Decimal('0'), Decimal('0'), multiply, Decimal('0')),  # Test zero * zero
+    (Decimal('0'), Decimal('10'), divide, Decimal('0')),  # Test zero divided by non-zero
+])
+def test_calculation_with_zero(a, b, operation, expected):
+    """
+    Test calculation with zero as one or both operands.
+    """
+    calc = Calculation(a, b, operation)
+    assert calc.perform() == expected
+
+def test_invalid_operator():
+    """Test that an invalid operator raises an exception."""
+    # Pass an invalid operator (None) to trigger an exception
+    with pytest.raises(TypeError):
+        calc = Calculation(Decimal('10'), Decimal('9'), None)
+        calc.perform()
